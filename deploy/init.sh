@@ -169,7 +169,7 @@ echo "Waiting for MongoDB to start..."
 sleep 10
 
 echo "Running fetchdata.js..."
-$COMPOSE -f docker-compose.gcp.yml run --rm lobby node server/scripts/fetchdata.js --no-images
+$COMPOSE -f docker-compose.gcp.yml run --rm lobby node server/scripts/fetchdata.js
 
 echo "Running importstandalonedecks.js..."
 $COMPOSE -f docker-compose.gcp.yml run --rm lobby node server/scripts/importstandalonedecks.js
@@ -188,7 +188,7 @@ echo "Useful commands:"
 echo "  View logs:        $COMPOSE -f docker-compose.gcp.yml logs -f"
 echo "  Restart:          $COMPOSE -f docker-compose.gcp.yml restart"
 echo "  Stop:             $COMPOSE -f docker-compose.gcp.yml down"
-echo "  Update card data: $COMPOSE -f docker-compose.gcp.yml run --rm lobby node server/scripts/fetchdata.js --no-images"
+echo "  Update card data: $COMPOSE -f docker-compose.gcp.yml run --rm lobby node server/scripts/fetchdata.js"
 echo ""
 echo "Set up a cron job to reload nginx after cert renewal:"
 echo '  0 0 1,15 * * docker exec throneteki-nginx-1 nginx -s reload 2>/dev/null'
