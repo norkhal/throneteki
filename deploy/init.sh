@@ -31,6 +31,17 @@ for cmd in docker git openssl; do
     fi
 done
 
+# Check Docker socket access (common issue: user not in docker group yet)
+if ! docker info &> /dev/null; then
+    echo "ERROR: Cannot connect to Docker. If you just ran setup-vm.sh, your"
+    echo "docker group membership hasn't taken effect yet. Fix with one of:"
+    echo ""
+    echo "  Option 1: newgrp docker   (then re-run this script)"
+    echo "  Option 2: Log out and SSH back in"
+    echo ""
+    exit 1
+fi
+
 if docker compose version &> /dev/null; then
     COMPOSE="docker compose"
 elif command -v docker-compose &> /dev/null; then
