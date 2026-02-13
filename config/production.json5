@@ -1,0 +1,14 @@
+{
+    origin: 'https://play.dragonstoneforge.com',
+    dbPath: 'mongodb://mongo:27017/throneteki',
+    redisUrl: 'redis://redis/',
+    redisKeyPrefix: 'prod',
+    nodeIdentity: 'node1',
+    socketioPort: 5000,
+    maxGames: 20,
+    minLobbyChatTime: 300,
+    requireActiviation: false,
+
+    // Secrets (secret, hmacSecret) must be set in config/local.json5
+    // which is excluded from version control via .gitignore.
+}

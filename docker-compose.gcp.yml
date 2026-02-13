@@ -1,0 +1,83 @@
+services:
+  mongo:
+    image: mongo:7
+    restart: always
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - throneteki
+
+  redis:
+    image: redis:7-alpine
+    restart: always
+    networks:
+      - throneteki
+
+  lobby:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: throneteki:lobby
+    restart: always
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - ./config/production.json5:/usr/src/app/config/production.json5:ro
+      - ./config/local.json5:/usr/src/app/config/local.json5:ro
+    depends_on:
+      - mongo
+      - redis
+    networks:
+      - throneteki
+
+  node:
+    build:
+      context: .
+      dockerfile: ./server/gamenode/Dockerfile
+    image: throneteki:node
+    restart: always
+    environment:
+      - NODE_ENV=production
+      - SERVER=node1
+    volumes:
+      - ./config/production.json5:/app/node/config/production.json5:ro
+      - ./config/local.json5:/app/node/config/local.json5:ro
+    depends_on:
+      - redis
+    networks:
+      - throneteki
+
+  nginx:
+    image: nginx:alpine
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./deploy/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - certbot_etc:/etc/letsencrypt:ro
+      - certbot_var:/var/lib/letsencrypt
+      - certbot_webroot:/var/www/certbot
+    depends_on:
+      - lobby
+      - node
+    networks:
+      - throneteki
+
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - certbot_etc:/etc/letsencrypt
+      - certbot_var:/var/lib/letsencrypt
+      - certbot_webroot:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do sleep 12h & wait $${!}; certbot renew --webroot -w /var/www/certbot; done'"
+
+volumes:
+  mongodb_data:
+  certbot_etc:
+  certbot_var:
+  certbot_webroot:
+
+networks:
+  throneteki:
+    driver: bridge
