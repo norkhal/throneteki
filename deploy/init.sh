@@ -31,6 +31,17 @@ for cmd in docker git openssl; do
     fi
 done
 
+# Check Docker socket access (common issue: user not in docker group yet)
+if ! docker info &> /dev/null; then
+    echo "ERROR: Cannot connect to Docker. If you just ran setup-vm.sh, your"
+    echo "docker group membership hasn't taken effect yet. Fix with one of:"
+    echo ""
+    echo "  Option 1: newgrp docker   (then re-run this script)"
+    echo "  Option 2: Log out and SSH back in"
+    echo ""
+    exit 1
+fi
+
 if docker compose version &> /dev/null; then
     COMPOSE="docker compose"
 elif command -v docker-compose &> /dev/null; then
@@ -158,7 +169,7 @@ echo "Waiting for MongoDB to start..."
 sleep 10
 
 echo "Running fetchdata.js..."
-$COMPOSE -f docker-compose.gcp.yml run --rm lobby node server/scripts/fetchdata.js --no-images
+$COMPOSE -f docker-compose.gcp.yml run --rm lobby node server/scripts/fetchdata.js
 
 echo "Running importstandalonedecks.js..."
 $COMPOSE -f docker-compose.gcp.yml run --rm lobby node server/scripts/importstandalonedecks.js
@@ -177,7 +188,7 @@ echo "Useful commands:"
 echo "  View logs:        $COMPOSE -f docker-compose.gcp.yml logs -f"
 echo "  Restart:          $COMPOSE -f docker-compose.gcp.yml restart"
 echo "  Stop:             $COMPOSE -f docker-compose.gcp.yml down"
-echo "  Update card data: $COMPOSE -f docker-compose.gcp.yml run --rm lobby node server/scripts/fetchdata.js --no-images"
+echo "  Update card data: $COMPOSE -f docker-compose.gcp.yml run --rm lobby node server/scripts/fetchdata.js"
 echo ""
 echo "Set up a cron job to reload nginx after cert renewal:"
 echo '  0 0 1,15 * * docker exec throneteki-nginx-1 nginx -s reload 2>/dev/null'
