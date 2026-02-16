@@ -20,6 +20,7 @@ ENV VITE_HCAPTCHA_SITE_KEY ${HCAPTCHA_SITE_KEY}
 ENV NODE_ENV production
 
 COPY . /usr/src/app
+RUN mkdir -p /usr/src/app/public/img/avatar
 
 RUN NODE_OPTIONS=--max-old-space-size=4096 npm run build
 
