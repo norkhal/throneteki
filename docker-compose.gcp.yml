@@ -25,6 +25,7 @@ services:
       - ./config/production.json5:/usr/src/app/config/production.json5:ro
       - ./config/local.json5:/usr/src/app/config/local.json5:ro
       - card_images:/usr/src/app/public/img/cards
+      - avatars:/usr/src/app/public/img/avatar
     depends_on:
       - mongo
       - redis
@@ -76,6 +77,7 @@ services:
 volumes:
   mongodb_data:
   card_images:
+  avatars:
   certbot_etc:
   certbot_var:
   certbot_webroot:
