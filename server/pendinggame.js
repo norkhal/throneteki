@@ -340,7 +340,7 @@ class PendingGame {
     }
 
     // Summary
-    getSummary(activePlayer) {
+    getSummary(activePlayer, isAuthenticated = true) {
         var playerSummaries = {};
         var playersInGame = _.filter(this.players, (player) => !player.left);
 
@@ -364,11 +364,11 @@ class PendingGame {
             //2. the game hasn´t started yet
             //3. agenda and faction are actually not undefined
             let agendas = [undefined];
-            if (!this.gamePrivate && this.started && player.agendas) {
+            if (isAuthenticated && !this.gamePrivate && this.started && player.agendas) {
                 agendas = player.agendas.map((card) => card.cardData.code);
             }
             let faction;
-            if (!this.gamePrivate && this.started && player.faction) {
+            if (isAuthenticated && !this.gamePrivate && this.started && player.faction) {
                 faction = player.faction.cardData.code;
             }
 

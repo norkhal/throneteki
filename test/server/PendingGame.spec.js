@@ -69,4 +69,76 @@ describe('PendingGame', function () {
             });
         });
     });
+
+    describe('getSummary', function () {
+        beforeEach(function () {
+            this.player = new User({ username: 'player1' });
+            this.game.addPlayer(1, this.player);
+            this.game.started = true;
+            this.game.gamePrivate = false;
+
+            // Set up faction and agendas on the player
+            let playerEntry = this.game.players[this.player.username];
+            playerEntry.faction = { cardData: { code: 'stark' } };
+            playerEntry.agendas = [{ cardData: { code: 'fealty' } }];
+        });
+
+        describe('when isAuthenticated is true', function () {
+            it('should include faction and agenda codes', function () {
+                let summary = this.game.getSummary(undefined, true);
+                let playerSummary = summary.players[this.player.username];
+
+                expect(playerSummary.faction).toBe('stark');
+                expect(playerSummary.agendas).toEqual(['fealty']);
+            });
+        });
+
+        describe('when isAuthenticated is false', function () {
+            it('should not include faction or agenda codes', function () {
+                let summary = this.game.getSummary(undefined, false);
+                let playerSummary = summary.players[this.player.username];
+
+                expect(playerSummary.faction).toBeUndefined();
+                expect(playerSummary.agendas).toEqual([undefined]);
+            });
+        });
+
+        describe('when isAuthenticated is not provided (default)', function () {
+            it('should include faction and agenda codes by default', function () {
+                let summary = this.game.getSummary();
+                let playerSummary = summary.players[this.player.username];
+
+                expect(playerSummary.faction).toBe('stark');
+                expect(playerSummary.agendas).toEqual(['fealty']);
+            });
+        });
+
+        describe('when game is private', function () {
+            beforeEach(function () {
+                this.game.gamePrivate = true;
+            });
+
+            it('should not include faction or agenda even when authenticated', function () {
+                let summary = this.game.getSummary(undefined, true);
+                let playerSummary = summary.players[this.player.username];
+
+                expect(playerSummary.faction).toBeUndefined();
+                expect(playerSummary.agendas).toEqual([undefined]);
+            });
+        });
+
+        describe('when game has not started', function () {
+            beforeEach(function () {
+                this.game.started = false;
+            });
+
+            it('should not include faction or agenda even when authenticated', function () {
+                let summary = this.game.getSummary(undefined, true);
+                let playerSummary = summary.players[this.player.username];
+
+                expect(playerSummary.faction).toBeUndefined();
+                expect(playerSummary.agendas).toEqual([undefined]);
+            });
+        });
+    });
 });

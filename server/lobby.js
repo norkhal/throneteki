@@ -201,9 +201,9 @@ class Lobby {
     }
 
     // Actions
-    mapGamesToGameSummaries(games) {
+    mapGamesToGameSummaries(games, isAuthenticated = true) {
         return _.chain(games)
-            .map((game) => game.getSummary())
+            .map((game) => game.getSummary(undefined, isAuthenticated))
             .value();
     }
 
@@ -239,10 +239,11 @@ class Lobby {
                 continue;
             }
 
+            let isAuthenticated = !!socket.user;
             let filteredGames = Object.values(games).filter((game) =>
                 game.isVisibleFor(socket.user)
             );
-            let gameSummaries = filteredGames.map((game) => game.getSummary());
+            let gameSummaries = filteredGames.map((game) => game.getSummary(undefined, isAuthenticated));
 
             if (gameSummaries.length > 0) {
                 socket.send(message, gameSummaries);
@@ -260,10 +261,11 @@ class Lobby {
         }
 
         for (let socket of Object.values(sockets)) {
+            let isAuthenticated = !!socket.user;
             let filteredGames = Object.values(this.games).filter((game) =>
                 game.isVisibleFor(socket.user)
             );
-            let gameSummaries = this.mapGamesToGameSummaries(filteredGames);
+            let gameSummaries = this.mapGamesToGameSummaries(filteredGames, isAuthenticated);
             socket.send('games', gameSummaries);
         }
     }
